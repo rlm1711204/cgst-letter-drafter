@@ -46,30 +46,40 @@ def _issue(level, where, msg):
     return {"level": level, "where": where, "msg": msg}
 
 
-def run_checks(letter: dict, profile: dict | None = None, today: dt.date | None = None) -> list[dict]:
+def run_checks(letter: dict, profile: dict | None = None, today: dt.date | None = None,
+               required: bool = True, din_required: bool | None = None) -> list[dict]:
+    """required=False skips letter-layout checks (used for SOP / other formats).
+    din_required overrides the letter-type rule."""
     profile = profile or {}
     today = today or dt.date.today()
     issues: list[dict] = []
     types = load_data("letter_types").get("letter_types", {})
     lt = letter.get("letter_type", "")
-    tinfo = types.get(lt, {})
+    tinfo = dict(types.get(lt, {}))
+    if din_required is not None:
+        tinfo["din_required"] = din_required
     if lt and lt not in types:
         issues.append(_issue("WARN", "letter_type", f"Unknown letter type '{lt}'. Known: {', '.join(types)}"))
 
     # ---- required fields -------------------------------------------------
-    if not letter.get("subject"):
+    if not required:
+        pass
+    elif not letter.get("subject"):
         issues.append(_issue("ERROR", "subject", "Subject is empty."))
-    if not letter.get("to"):
-        issues.append(_issue("ERROR", "to", "No addressee given."))
-    if not letter.get("body_paragraphs"):
-        issues.append(_issue("ERROR", "body", "Letter body is empty."))
-    if not letter.get("file_no"):
-        issues.append(_issue("WARN", "file_no", "File No. is empty - add the e-Office / file number."))
-    sig = letter.get("signatory", {})
-    if not sig.get("name"):
-        issues.append(_issue("WARN", "signatory", "Signatory name is empty - add it (quick edit box) or in the profile."))
-    if not sig.get("designation"):
-        issues.append(_issue("WARN", "signatory", "Signatory designation is empty (set it in the office profile)."))
+    if required:
+        if not letter.get("to"):
+            issues.append(_issue("ERROR", "to", "No addressee given."))
+        if not letter.get("body_paragraphs"):
+            issues.append(_issue("ERROR", "body", "Letter body is empty."))
+        if not letter.get("file_no"):
+            issues.append(_issue("WARN", "file_no", "File No. is empty - add the e-Office / file number."))
+        sig = letter.get("signatory", {})
+        if not sig.get("name"):
+            issues.append(_issue("WARN", "signatory", "Signatory name is empty - add it (quick edit box) or in "
+                                                      "the profile."))
+        if not sig.get("designation"):
+            issues.append(_issue("WARN", "signatory", "Signatory designation is empty (set it in the office "
+                                                      "profile)."))
 
     # ---- date ------------------------------------------------------------
     d = parse_date(letter.get("date"))
@@ -82,7 +92,8 @@ def run_checks(letter: dict, profile: dict | None = None, today: dt.date | None 
 
     # ---- DIN ---------------------------------------------------------------
     din = (letter.get("din") or "").strip()
-    to_taxpayer = any(a.get("gstin") for a in letter.get("to", [])) or tinfo.get("din_required")
+    to_taxpayer = tinfo.get("din_required") if din_required is not None else (
+        any(a.get("gstin") for a in letter.get("to", [])) or tinfo.get("din_required"))
     if not din and to_taxpayer:
         issues.append(_issue("ERROR", "din", "No DIN. Communications to taxpayers must carry a DIN generated on "
                                              "the CBIC DDM portal (Circular No. 122/41/2019-GST dated 05.11.2019); "
@@ -149,6 +160,23 @@ def run_checks(letter: dict, profile: dict | None = None, today: dt.date | None 
     fys = legal.financial_years(full + " " + kf_text)
     for level, msg in legal.fy_rules(cites, fys):
         issues.append(_issue(level, "citation", msg))
+    demand_secs = {c["number"] for c in cites if c["kind"] == "section"} & {"73", "74", "74A"}
+    if demand_secs and fys:
+        for row in legal.demand_time_limits(fys, today):
+            if "section" not in row:
+                issues.append(_issue("INFO", "time limit", f"FY {row['fy']}: {row['note']}"))
+            elif row["section"] in demand_secs or (row["section"] == "73" and "74" in demand_secs):
+                when = f"SCN by {row['scn_last_date']:%d.%m.%Y}"
+                if row.get("order_last_date"):
+                    when += f", order by {row['order_last_date']:%d.%m.%Y}"
+                lvl = "WARN" if row["scn_expired"] else "INFO"
+                msg = (f"FY {row['fy']} under Section {row['section']}: {when} (annual return due "
+                       f"{row['annual_return_due']:%d.%m.%Y}; ignores any extension - verify).")
+                if row["scn_expired"]:
+                    msg = "TIME LIMIT PASSED - " + msg
+                    if row["section"] == "73":
+                        msg += " Only Section 74 (fraud / wilful misstatement / suppression) would remain available."
+                issues.append(_issue(lvl, "time limit", msg))
     for c in letter.get("legal_citations", []):
         if str(c.get("basis", "")).lower().startswith("sugg"):
             issues.append(_issue("WARN", "citation", f"'{c.get('provision', '')}' was SUGGESTED by AI (not in the "
@@ -174,7 +202,7 @@ def run_checks(letter: dict, profile: dict | None = None, today: dt.date | None 
 
     # ---- AI's own uncertainty ------------------------------------------------
     for m in letter.get("missing_or_uncertain", []):
-        issues.append(_issue("WARN", "NotebookLM flagged", m))
+        issues.append(_issue("WARN", "AI flagged", m))
 
     order = {"ERROR": 0, "WARN": 1, "INFO": 2}
     issues.sort(key=lambda x: order.get(x["level"], 3))

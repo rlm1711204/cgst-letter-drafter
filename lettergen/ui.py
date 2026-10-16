@@ -10,7 +10,7 @@ import shutil
 import uuid
 from pathlib import Path
 
-from . import builders, checks, legal, prompts, register, themes
+from . import builders, checks, formats, legal, prompts, register, slots, themes
 from .config import EXAMPLES_DIR, TEMPLATES_DIR, Workspace, load_data
 from .numbers import indian_format, rupees_in_words
 from .parser import ParseError, extract_json
@@ -55,6 +55,7 @@ class Session:
     edit_box = None
     edit_original = ""
     instruction = ""
+    fmt = "letter"
 
 
 S = Session()
@@ -131,10 +132,23 @@ def setup(use_drive: bool = True, quiet: bool = False):
 
 
 # =========================================================================== step 1: NotebookLM prompt
-def step1_prompt(letter_type: str, instruction: str, letter_date: str = "", file_no: str = "", din: str = ""):
+def step1_prompt(letter_type: str, instruction: str, letter_date: str = "", file_no: str = "", din: str = "",
+                 doc_format: str = "letter"):
     ws = _need_ws()
     S.instruction = instruction
-    ws.save_settings(last_letter_type=letter_type, last_instruction=instruction)
+    fmt = formats.key_for(doc_format)
+    ws.save_settings(last_letter_type=letter_type, last_instruction=instruction, last_format=fmt)
+    if fmt != "letter":
+        cfg = formats.registry()[fmt]
+        p = formats.prompt(fmt, instruction, ws.profile(), letter_date, file_no, din)
+        _say(f"Format: <b>{html.escape(cfg['label'])}</b>. 1️⃣ Upload the sources to NotebookLM, <b>or</b> attach "
+             "screenshots (GST Prime / BO profile, returns) and documents to Gemini / ChatGPT / Claude. "
+             "2️⃣ Paste this prompt. 3️⃣ Copy the whole answer into Step 5.")
+        copy_box(p, f"PROMPT → NotebookLM / Gemini / ChatGPT ({cfg['label']})", f"{fmt}_prompt.txt", 260)
+        if cfg.get("din_required"):
+            _say("Reminder: generate the DIN on the CBIC DDM portal; a letter to a taxpayer without a DIN is invalid.",
+                 "warn")
+        return p
     p = prompts.notebooklm_prompt(letter_type, instruction, ws.profile(), letter_date, file_no, din)
     _say("1️⃣ Upload your source document(s) to NotebookLM. 2️⃣ Copy this prompt and paste it into the "
          "NotebookLM chat. 3️⃣ Copy the whole answer and paste it in Step 5.")
@@ -217,11 +231,17 @@ def step3_template(mode_label: str, upload_new: bool = False, keep_top_blocks: i
             settings["template_path"] = str(path)
         else:
             settings["letterhead_path"] = str(path)
+            settings["format_letterhead_path"] = str(path)
             settings["mode"] = "theme_image"
     ws.save_settings(**settings)
     _say(f"✅ Template setting saved: <b>{html.escape(mode_label)}</b>" +
          (f" · file <code>{html.escape(path.name)}</code>" if path else ""), "ok")
     if path is not None and path.suffix.lower() == ".docx":
+        lh = extract_letterhead(path, ws.templates)
+        if lh:
+            ws.save_settings(format_letterhead_path=str(lh))
+            _say(f"🖼️ Letterhead picture taken from this file for the exact-format documents "
+                 f"(Letter + Notesheet ...): <code>{html.escape(lh.name)}</code>", "ok")
         rep = builders.analyze_sample(path)
         ws.save_settings(detected=rep["detected"])
         _show_analysis(rep, settings["keep_top_blocks"], mode)
@@ -344,12 +364,56 @@ def step5_check(pasted: str | None = None, show_preview: bool = True):
         _say("⛔ " + html.escape(str(e)).replace("\n", "<br>"), "err")
         copy_box(prompts.load("fix_json"), "PROMPT 04 → NotebookLM (fix invalid JSON)", None, 120)
         return None
+    return _route(raw, notes, show_preview)
+
+
+def _route(raw, notes, show_preview=True):
+    ws = _need_ws()
+    fmt = formats.detect(raw)
+    S.fmt = fmt
+    if fmt != "letter":
+        data, n2 = formats.normalise(fmt, raw, ws.profile())
+        return _analyse_format(fmt, data, notes + n2, show_preview)
     letter, notes2 = normalise(raw, ws.profile())
     return _analyse(letter, notes + notes2, raw, show_preview)
 
 
+def _format_letterhead():
+    st = _need_ws().settings()
+    for key in ("format_letterhead_path", "letterhead_path"):
+        if st.get(key) and Path(st[key]).exists():
+            return st[key]
+    return None
+
+
+def _analyse_format(fmt, data, notes, show_preview=True):
+    ws = _need_ws()
+    cfg = formats.registry()[fmt]
+    S.letter, S.raw, S.notes = data, data, notes
+    S.issues = formats.run_checks(fmt, data, ws.profile())
+    S.citations = legal.scan_citations("\n".join(slots.as_text(v) for k, v in data.items()
+                                                  if k not in ("key_facts", "legal_citations", "deadlines")))
+    _say(f"📄 Format detected: <b>{html.escape(cfg['label'])}</b>")
+    for n in notes:
+        _say("ℹ️ " + html.escape(n))
+    _say(f"<b>Result:</b> {checks.summary(S.issues)}",
+         "err" if any(i["level"] == "ERROR" for i in S.issues) else "ok")
+    _html(issues_html(S.issues))
+    _html(citations_html(S.citations))
+    if cfg.get("regions", {}).get("_images") and not _format_letterhead():
+        _say("No letterhead picture yet - upload your sample letter (.docx) or letterhead image in Step 3. "
+             "The letter will be made without it.", "warn")
+    if show_preview:
+        doc, _ = formats.build(fmt, data, _format_letterhead())
+        _html("<h4 style='font-family:Arial'>Preview (text only - the Word file keeps the exact format)</h4>")
+        _html(formats.preview_html(doc))
+    _show_edit_box(data)
+    return data
+
+
 def _analyse(letter, notes, raw=None, show_preview=True):
     ws = _need_ws()
+    S.fmt = "letter"
     S.letter, S.raw, S.notes = letter, raw or letter, notes
     S.issues = checks.run_checks(letter, ws.profile())
     full = "\n".join(t for _, t in iter_text(letter))
@@ -398,9 +462,8 @@ def step6_generate(make_pdf: bool = False, download: bool = True, add_to_registe
         except ParseError as e:
             _say("⛔ Your quick edit is not valid JSON: " + html.escape(str(e)), "err")
             return None
-        letter, n2 = normalise(raw, ws.profile())
         _say("Using your edited version - re-checking ...")
-        _analyse(letter, notes + n2, raw, show_preview=False)
+        _route(raw, notes, show_preview=False)
     if not S.letter:
         _say("Run Step 5 first.", "err")
         return None
@@ -409,6 +472,8 @@ def step6_generate(make_pdf: bool = False, download: bool = True, add_to_registe
         _say(f"⛔ {len(errs)} error(s) must be fixed first (or tick ALLOW_WITH_ERRORS to make a draft anyway): "
              + "; ".join(html.escape(i["msg"][:90]) for i in errs[:4]), "err")
         return None
+    if S.fmt != "letter":
+        return _generate_format(make_pdf, download, add_to_register)
     st = ws.settings()
     th = current_theme()
     mode = st.get("mode", "auto")
@@ -424,23 +489,49 @@ def step6_generate(make_pdf: bool = False, download: bool = True, add_to_registe
     keep = st.get("keep_top_blocks", -1)
     doc, rep = builders.generate(S.letter, th, ws.profile(), mode=mode, template_path=tpl,
                                  letterhead_image=lh, keep_top=keep)
+    out = _out_path(S.letter.get("letter_type") or "letter", S.letter.get("subject"))
+    return _save_outputs(doc, rep, out, S.letter, make_pdf, download, add_to_register)
+
+
+def _out_path(kind: str, title: str) -> Path:
+    ws = _need_ws()
     d = dt.date.today()
     folder = ws.outputs / d.strftime("%Y-%m")
     folder.mkdir(parents=True, exist_ok=True)
-    base = f"{d:%Y%m%d}_{S.letter.get('letter_type') or 'letter'}_{_slug(S.letter.get('subject'))}"
+    base = f"{d:%Y%m%d}_{kind}_{_slug(title)}"
     out = folder / f"{base}.docx"
     i = 2
     while out.exists():
         out = folder / f"{base}_v{i}.docx"
         i += 1
+    return out
+
+
+def _generate_format(make_pdf, download, add_to_register):
+    fmt, data = S.fmt, S.letter
+    cfg = formats.registry()[fmt]
+    doc, rep = formats.build(fmt, data, _format_letterhead())
+    kf = data.get("key_facts", {})
+    title = kf.get("legal_name") or kf.get("trade_name") or data.get("subject") or fmt
+    out = _out_path(cfg.get("file_stub", fmt), title)
+    reg_row = {"letter_type": fmt, "file_no": data.get("file_no", ""), "din": data.get("din", ""),
+               "date": data.get("date", ""), "subject": data.get("subject") or data.get("notesheet_subject") or
+               f"{cfg['label']} - {title}",
+               "to": [{"name": (data.get("to_lines") or [kf.get("legal_name", "")])[0]}]}
+    return _save_outputs(doc, rep, out, reg_row, make_pdf, download, add_to_register, data)
+
+
+def _save_outputs(doc, rep, out, reg_row, make_pdf, download, add_to_register, data=None):
+    ws = _need_ws()
     doc.save(str(out))
-    (out.with_suffix(".json")).write_text(json.dumps(S.letter, indent=2, ensure_ascii=False), encoding="utf-8")
+    (out.with_suffix(".json")).write_text(json.dumps(data or S.letter, indent=2, ensure_ascii=False),
+                                          encoding="utf-8")
     S.last_docx = out
-    _say(f"✅ Word file created ({rep['mode']} mode): <code>{html.escape(str(out))}</code>", "ok")
+    _say(f"✅ Word file created ({html.escape(rep['mode'])}): <code>{html.escape(str(out))}</code>", "ok")
     if rep.get("unknown_tags"):
         _say("⚠️ Template tags not filled: " + html.escape(", ".join(rep["unknown_tags"])), "warn")
     if add_to_register:
-        reg = register.append(ws.root, S.letter, S.issues, out)
+        reg = register.append(ws.root, reg_row, S.issues, out)
         _say(f"📒 Added to register: <code>{html.escape(str(reg))}</code>")
     if make_pdf:
         ensure_libreoffice()
@@ -463,7 +554,8 @@ def step7_verify_prompts():
         return None
     text = builders.docx_text(S.last_docx)
     p2 = prompts.fact_check_prompt(text)
-    p3 = prompts.verification_prompt(S.letter, text, S.issues, S.citations, S.instruction)
+    vl = S.letter if S.fmt == "letter" else dict(S.letter, letter_type=formats.registry()[S.fmt]["label"])
+    p3 = prompts.verification_prompt(vl, text, S.issues, S.citations, S.instruction)
     copy_box(p2, "PROMPT 02 → same NotebookLM notebook (facts vs. source)", "02_fact_check.txt", 200)
     copy_box(p3, "PROMPT 03 → ChatGPT / Claude / Gemini (legal provisions, limitation, format)",
              "03_legal_verification.txt", 240)
@@ -565,3 +657,31 @@ def ensure_libreoffice() -> bool:
     subprocess.run("apt-get -qq update && apt-get -qq install -y libreoffice-writer-nogui >/dev/null",
                    shell=True, check=False)  # pragma: no cover
     return bool(shutil.which("soffice"))  # pragma: no cover
+
+
+def extract_letterhead(docx_path, dest: Path) -> Path | None:
+    """Save the picture at the top of a sample letter (first page header or first body paragraphs)."""
+    from docx import Document
+    from docx.oxml.ns import qn as _qn
+    doc = Document(str(docx_path))
+    cands = []
+    for s in doc.sections[:1]:
+        for hf in (s.first_page_header, s.header):
+            try:
+                if not hf.is_linked_to_previous:
+                    cands.append((hf.part, hf._element))
+            except Exception:
+                pass
+    body_top = [el for el in doc.element.body if el.tag == _qn("w:p")][:3]
+    cands += [(doc.part, el) for el in body_top]
+    for part, el in cands:
+        for blip in el.iter(_qn("a:blip")):
+            rid = blip.get(_qn("r:embed"))
+            if not rid or rid not in part.rels:
+                continue
+            img = part.rels[rid].target_part
+            ext = Path(getattr(img, "partname", "x.png")).suffix or ".png"
+            out = Path(dest) / f"letterhead_{Path(docx_path).stem}{ext}"
+            out.write_bytes(img.blob)
+            return out
+    return None

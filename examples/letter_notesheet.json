@@ -1,0 +1,31 @@
+{
+  "format": "letter_notesheet",
+  "file_no": "GEXCOM/INV/DEMO/01/2026",
+  "din": "CBIC-DIN-20261056XY000099ZZ11",
+  "date": "16.10.2026",
+  "to_lines": ["M/s MURUGAN CABLE NETWORKS PRIVATE LIMITED", "(GSTIN: 33AAKCM4417R1ZZ / PAN: AAKCM4417R)", "No. 1, Demo Street,", "Demo Town,", "Tirunelveli District, Tamil Nadu – 627001."],
+  "salutation": "Sir / Madam,",
+  "subject": "GST — Verification of Input Tax Credit — ITC availed on invoices of suo-moto cancelled suppliers — Call for documents – Regarding.",
+  "letter_body": [
+    {"style": "first", "text": "It is informed that, on verification of the returns filed by you, input tax credit appears to have been availed on invoices issued by suppliers whose registrations stand cancelled suo-moto. (Demo example - fictional data.)"},
+    {"style": "numbered", "text": "In order to verify the eligibility of the said credit under Section 16(2) of the CGST Act, 2017, you are requested to produce copies of the following documents for the period **__Financial Year 2024-25__** within seven (7) days of receipt of this letter:"},
+    {"style": "item", "text": "Purchase invoices of the suppliers listed in the Annexure."},
+    {"style": "item", "text": "Proof of payment to the suppliers (bank statements)."},
+    {"style": "item", "text": "Proof of receipt of goods / services (delivery challans, e-way bills)."},
+    {"style": "numbered", "text": "Failure to furnish the documents within the time allowed may result in action as per the provisions of the CGST Act, 2017."}
+  ],
+  "closing": "Yours faithfully,",
+  "signatory_lines": ["(Officer Name)", "Superintendent"],
+  "notesheet_subject": "Verification of ITC – M/s MURUGAN CABLE NETWORKS PRIVATE LIMITED, GSTIN: 33AAKCM4417R1ZZ – ITC from suo-moto cancelled suppliers – reg.",
+  "notesheet_body": [
+    {"style": "para", "text": "M/s Murugan Cable Networks Private Limited (GSTIN: 33AAKCM4417R1ZZ) is a regular taxpayer engaged in broadcast distribution services (SAC 998465). (Demo example - fictional data.)"},
+    {"style": "para", "text": "Comparison of GSTR-2B with GSTR-3B for FY 2024-25 shows ITC of ₹18,80,000/- (Rupees Eighteen Lakh Eighty Thousand only) availed on invoices of three suppliers whose registrations were cancelled suo-moto."},
+    {"style": "plain", "text": "It is therefore proposed to call for the following documents from the taxpayer:"},
+    {"style": "item", "text": "Purchase invoices of the said suppliers."},
+    {"style": "item", "text": "Proof of payment and receipt of goods / services."},
+    {"style": "plain", "text": "Submitted for perusal and approval of the competent authority."}
+  ],
+  "notesheet_signatory_lines": ["Inspector"],
+  "key_facts": {"legal_name": "Murugan Cable Networks Private Limited", "gstin": "33AAKCM4417R1ZZ", "period": "2024-25"},
+  "missing_or_uncertain": []
+}

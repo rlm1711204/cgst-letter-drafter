@@ -1,0 +1,34 @@
+{
+  "_comment": "Document formats. 'letter' uses the theme/clone engine. Every other format is an exact-format template in templates/formats/ filled through [[MARKERS]] (see templates/formats/README.md). To add a format: make the template, write its prompt in prompts/, add a demo example, and add a block here.",
+  "formats": {
+    "letter": {
+      "label": "Letter (generic - choose a letter type)",
+      "engine": "letter"
+    },
+    "sop_checklist": {
+      "label": "SOP checklist - Filing of Intelligence & Investigation",
+      "engine": "slots",
+      "template": "sop_checklist.docx",
+      "prompt": "10_sop_checklist.md",
+      "example": "sop_checklist.json",
+      "din_required": false,
+      "file_stub": "SOP_Checklist"
+    },
+    "letter_notesheet": {
+      "label": "Letter to taxpayer + Notesheet (for approval)",
+      "engine": "slots",
+      "template": "letter_notesheet.docx",
+      "prompt": "11_letter_notesheet.md",
+      "example": "letter_notesheet.json",
+      "din_required": true,
+      "file_stub": "Letter_Notesheet",
+      "labels": {"file_no": "C.No.", "date": "Date:", "din": "DIN:"},
+      "regions": {
+        "LETTER_BODY": {"count_styles": ["first", "numbered"], "prefix": {"numbered": "{n}. \t"},
+                        "default_style": "numbered"},
+        "NOTESHEET_BODY": {"count_styles": [], "prefix": {}, "default_style": "para"},
+        "_images": {"LETTERHEAD": {"width_emu": 6691188}}
+      }
+    }
+  }
+}

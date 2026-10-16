@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT))
 
 from lettergen import builders, checks, config, legal, numbers, parser, prompts, schema, themes  # noqa: E402
 
-EXAMPLES = sorted((ROOT / "examples").glob("*.json"))
+EXAMPLES = sorted(p for p in (ROOT / "examples").glob("*.json") if '"format"' not in p.read_text(encoding="utf-8"))
 PROFILE = dict(config.DEFAULT_PROFILE, signatory_name="Test Officer", signatory_designation="Superintendent")
 TODAY = dt.date(2026, 10, 16)
 

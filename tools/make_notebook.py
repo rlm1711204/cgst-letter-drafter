@@ -27,7 +27,7 @@ md(f"""
 | Step | Where | What you do |
 |---|---|---|
 | 0 | Colab | Run **Setup** once per session |
-| 1 | Colab → NotebookLM | Copy the prompt into NotebookLM (with your source PDFs uploaded) |
+| 1 | Colab → NotebookLM / Gemini | Choose the **document format** (Letter · SOP checklist · Letter + Notesheet) and copy the prompt into NotebookLM (PDFs), or into Gemini / ChatGPT with **Prime portal screenshots** attached |
 | 2 | Colab | *(first time only)* Office profile: office name, signatory |
 | 3 | Colab | *(first time only)* Upload your **sample letter .docx** or **letterhead image** |
 | 4 | Colab | Choose a theme: fonts, spacing, numbering, labels |
@@ -67,21 +67,25 @@ ui.setup(use_drive=USE_GOOGLE_DRIVE)
 """)
 
 md("""
-## 📝 STEP 1 · Get the NotebookLM prompt
-1. Open **[NotebookLM](https://notebooklm.google.com)** → *New notebook* → upload the source(s): incoming letter, OIO/OIA, SCN, writ petition, court order...
-2. Fill in the form below, run the cell, press **📋 Copy**, and paste into the NotebookLM chat.
-3. When NotebookLM answers, use the **copy** button under its answer, then go to Step 5.
+## 📝 STEP 1 · Get the prompt
+1. Choose a **DOCUMENT_FORMAT**:
+   * **Letter (generic)**: any official letter; pick a LETTER_TYPE as well. Uses your sample letter / theme.
+   * **SOP checklist**: the 20-row *Filing of Intelligence & Investigation* table, in your exact format.
+   * **Letter + Notesheet**: letter to the taxpayer plus a notesheet for approval, in your exact format with your letterhead.
+2. Sources: upload PDFs to **[NotebookLM](https://notebooklm.google.com)**, **or** attach screenshots (GST Prime / BO taxpayer profile, return filing, ledgers) and documents to **Gemini / ChatGPT / Claude**.
+3. Run the cell, press **📋 Copy**, paste into the AI, and copy its whole answer into Step 5.
 """)
 
 code("""
 #@title 📝 STEP 1 · Build the prompt for NotebookLM { display-mode: "form" }
+DOCUMENT_FORMAT = "Letter (generic - choose a letter type)"  #@param ["Letter (generic - choose a letter type)", "SOP checklist - Filing of Intelligence & Investigation", "Letter to taxpayer + Notesheet (for approval)"]
 LETTER_TYPE = "Appeal / Review (OIO / OIA)"  #@param ["Letter to Taxpayer", "Appeal / Review (OIO / OIA)", "Court / Writ Matter", "SCN / Adjudication", "Administrative / Inter-office"]
 WHAT_SHOULD_THE_LETTER_DO = "Forward the application under Section 107(2) against the OIO to the Commissioner (Appeals)"  #@param {type:"string"}
 LETTER_DATE = ""  #@param {type:"string"}
 FILE_NO = ""  #@param {type:"string"}
 DIN = ""  #@param {type:"string"}
-#@markdown *Leave LETTER_DATE blank for today. Leave FILE_NO / DIN blank if you'll add them later; the checker reminds you.*
-ui.step1_prompt(LETTER_TYPE, WHAT_SHOULD_THE_LETTER_DO, LETTER_DATE, FILE_NO, DIN);
+#@markdown *LETTER_TYPE is used only for the generic Letter. Leave LETTER_DATE blank for today, and FILE_NO / DIN blank if you'll add them later; the checker reminds you.*
+ui.step1_prompt(LETTER_TYPE, WHAT_SHOULD_THE_LETTER_DO, LETTER_DATE, FILE_NO, DIN, doc_format=DOCUMENT_FORMAT);
 """)
 
 md("""
@@ -115,6 +119,8 @@ md("""
 | **Text letterhead + theme** | nothing | Uses the office profile lines as the letterhead |
 
 Tick **UPLOAD_NEW_FILE** the first time, or whenever you change the file. To try it out, pick a **DEMO_FILE**.
+
+**Exact formats (SOP checklist, Letter + Notesheet)** keep their own fixed layout. They only need your **letterhead picture**: upload any of your letters (.docx) here and the letterhead is taken from it automatically, or upload the letterhead image (PNG/JPG). It stays in your Drive and is never put on GitHub.
 """)
 
 code("""

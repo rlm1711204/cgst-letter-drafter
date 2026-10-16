@@ -19,12 +19,11 @@ LOCAL_ROOT = Path(os.environ.get("LETTERGEN_HOME", "/content/CGST_Letter_Drafter
 
 DEFAULT_PROFILE = {
     "office_lines": [
-        "भारत सरकार / GOVERNMENT OF INDIA",
-        "वित्त मंत्रालय, राजस्व विभाग / MINISTRY OF FINANCE, DEPARTMENT OF REVENUE",
-        "OFFICE OF THE COMMISSIONER OF CGST & CENTRAL EXCISE",
-        "TIRUNELVELI COMMISSIONERATE",
+        "माल और सेवा कर एवं केन्द्रीय उत्पाद शुल्क के अपर आयुक्त का कार्यालय",
+        "OFFICE OF THE ADDITIONAL COMMISSIONER OF GST AND CENTRAL EXCISE",
+        "TIRUNELVELI",
     ],
-    "office_address": "[Office address - edit in Step 2]",
+    "office_address": "No.7, Tractor Road, N.G.O. \"A\" Colony, Tirunelveli - 627007",
     "office_contact": "Phone: [ ]  |  Email: [ ]",
     "section": "Legal Section",
     "file_no_prefix": "",

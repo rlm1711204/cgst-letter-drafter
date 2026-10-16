@@ -16,6 +16,8 @@ _RULE_RE = re.compile(r"\bRules?\s*(\d{1,3}[A-Z]{0,2})((?:\s*\(\s*[0-9A-Za-z]{1,
 _FORM_RE = re.compile(r"\b(?:GST\s+|FORM\s+GST\s+)?((?:ASMT|ADT|DRC|APL|REG|RFD|MOV|PMT|CMP|ITC)\s*-\s*\d{2}[A-C]?)\b",
                       re.I)
 _FY_RE = re.compile(r"\b(20[12]\d)\s*[-–/]\s*(20)?(\d{2})\b")
+_FY_RANGE_RE = re.compile(r"\b(20[12]\d)\s*[-–]\s*\d{2}\s*(?:to|till|upto|up to|-|–)\s*"
+                          r"(?:F\.?Y\.?|Financial Year)?\s*(20[12]\d)\s*[-–]\s*\d{2}\b", re.I)
 
 ACT_PATTERNS = [
     ("IGST", r"IGST|Integrated Goods"),
@@ -126,6 +128,10 @@ def financial_years(text: str) -> list[int]:
         start, end = int(m.group(1)), int(m.group(3))
         if (start + 1) % 100 == end:
             years.add(start)
+    for m in _FY_RANGE_RE.finditer(text):
+        a, b = int(m.group(1)), int(m.group(2))
+        if a <= b <= a + 15:
+            years.update(range(a, b + 1))
     return sorted(years)
 
 
@@ -137,6 +143,10 @@ def fy_rules(citations: list[dict], fys: list[int]) -> list[tuple[str, str]]:
     nums = {c["number"] for c in citations if c["kind"] == "section" and c["act"] in ("CGST", "TNGST", "UNSPECIFIED")}
     late = [y for y in fys if y >= 2024]
     early = [y for y in fys if y <= 2023]
+    if late and early and ({"73", "74"} & nums) and "74A" in nums:
+        issues.append(("INFO", "Both Section 73/74 and Section 74A are cited for a period spanning FY 2023-24 and "
+                               "FY 2024-25 - make sure each FY is mapped to the right section."))
+        return issues
     if late and ({"73", "74"} & nums):
         issues.append(("WARN", f"Section 73/74 cited, but the period includes FY {late[0]}-{str(late[0] + 1)[2:]}. "
                                "For FY 2024-25 onwards demands are under Section 74A (Finance (No. 2) Act, 2024). "
@@ -186,3 +196,33 @@ def monetary_limit_note(text: str, amount) -> str | None:
                         "File only if an exception in the circular applies.")
             return None
     return None
+
+
+def demand_time_limits(fys: list[int], today: dt.date | None = None) -> list[dict]:
+    """Time limits for demands by financial year (start year), counted from the annual return due date
+    (31 December after the FY). FY 2017-18 to 2020-21 had extended due dates / Section 168A notifications,
+    so they are only flagged, not computed."""
+    today = today or dt.date.today()
+    rows = []
+    for y in sorted(set(fys)):
+        fy = f"{y}-{str(y + 1)[2:]}"
+        if y <= 2020:
+            rows.append({"fy": fy, "note": "Due dates and Section 73/74 time limits were extended by notifications "
+                                           "(incl. under Section 168A) - verify before relying on any date."})
+            continue
+        due = dt.date(y + 1, 12, 31)
+        if y >= 2024:
+            scn = due + relativedelta(months=42)
+            rows.append({"fy": fy, "section": "74A", "annual_return_due": due, "scn_last_date": scn,
+                         "order_last_date": None, "scn_expired": scn < today,
+                         "note": "Section 74A(2): SCN within 42 months of the annual return due date; order within "
+                                 "12 months of SCN (extendable by 6 months)."})
+            continue
+        o73, o74 = due + relativedelta(years=3), due + relativedelta(years=5)
+        rows.append({"fy": fy, "section": "73", "annual_return_due": due, "order_last_date": o73,
+                     "scn_last_date": o73 - relativedelta(months=3), "scn_expired": o73 - relativedelta(months=3) < today,
+                     "note": "Section 73(10)/(2): order within 3 years; SCN at least 3 months earlier."})
+        rows.append({"fy": fy, "section": "74", "annual_return_due": due, "order_last_date": o74,
+                     "scn_last_date": o74 - relativedelta(months=6), "scn_expired": o74 - relativedelta(months=6) < today,
+                     "note": "Section 74(10)/(2): order within 5 years; SCN at least 6 months earlier."})
+    return rows
