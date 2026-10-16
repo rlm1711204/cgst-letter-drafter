@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "letter_type": "scn_adjudication",
+  "file_no": "GEXCOM/ADJN/SCN/64/2026",
+  "din": "CBIC-DIN-20261056XY000045CD12",
+  "date": "16.10.2026",
+  "to": [{"name": "M/s Nellai Steels Private Limited", "address_lines": ["SIDCO Industrial Estate, Pettai,", "Tirunelveli - 627 010."], "gstin": "33AAACT5678L1ZX"}],
+  "subject": "Show Cause Notice No. 22/2026-GST dated 18.08.2026 issued under Section 74A of the CGST Act, 2017 for the period 2024-25 - Personal hearing - reg.",
+  "references": ["Show Cause Notice No. 22/2026-GST dated 18.08.2026"],
+  "body_paragraphs": [
+    "Please refer to the Show Cause Notice cited above.",
+    "In accordance with Section 75(4) of the CGST Act, 2017, you are hereby given an opportunity of personal hearing on 05.11.2026 at 11.00 hrs before the undersigned. You may appear in person or through your authorised representative, or attend through video conferencing using the link that will be sent to your registered email.",
+    "If you fail to appear on the said date, the case will be decided on the basis of the records available, without further reference to you."
+  ],
+  "signatory": {"designation": "Joint Commissioner"},
+  "key_facts": {"period": "2024-25", "document_no": "22/2026-GST", "document_date": "18.08.2026"},
+  "missing_or_uncertain": []
+}

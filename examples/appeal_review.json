@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "letter_type": "appeal_review",
+  "file_no": "GEXCOM/LGL/REV/145/2026-LEGAL",
+  "din": "",
+  "date": "16.10.2026",
+  "to": [
+    {"name": "", "designation": "The Commissioner of GST & Central Excise (Appeals)", "organisation": "",
+     "address_lines": ["[TO BE CONFIRMED: address of the Appellate Authority]"], "gstin": "", "email": ""}
+  ],
+  "through": "",
+  "kind_attention": "",
+  "subject": "Filing of application under Section 107(2) of the CGST Act, 2017 against Order-in-Original No. 18/2026-GST (ADC) dated 30.07.2026 in the case of M/s Sri Murugan Traders, GSTIN 33AABFS1234K1ZH - reg.",
+  "references": [
+    "Order-in-Original No. 18/2026-GST (ADC) dated 30.07.2026 passed by the Additional Commissioner of CGST & Central Excise",
+    "Review Order No. 07/2026-GST (Review) dated 10.10.2026 of the Commissioner"
+  ],
+  "salutation": "Sir/Madam,",
+  "body_paragraphs": [
+    "I am directed to forward herewith the application in FORM GST APL-03 filed under Section 107(2) of the Central Goods and Services Tax Act, 2017 read with Section 107(2) of the Tamil Nadu Goods and Services Tax Act, 2017 and Rule 109 of the CGST Rules, 2017, against the Order-in-Original cited at reference (1) above, which was received in this office on 04.08.2026.",
+    "The Show Cause Notice No. 41/2025-GST dated 12.03.2025 was issued to M/s Sri Murugan Traders under Section 73 of the CGST Act, 2017 for the period 2022-23, demanding ineligible input tax credit availed on invoices issued by non-existent suppliers, along with interest under Section 50 and penalty under Section 73(9).",
+    {"table": {"caption": "Demand proposed and dropped",
+               "headers": ["Head", "Tax proposed (₹)", "Tax dropped in OIO (₹)"],
+               "rows": [["CGST", "4,12,500", "4,12,500"], ["SGST", "4,12,500", "4,12,500"], ["Total", "8,25,000", "8,25,000"]]}},
+    {"text": "The Commissioner, on examination of the records, found the order not legal and proper on the following grounds:",
+     "points": [
+       "The adjudicating authority has dropped the demand without examining the investigation report of the jurisdictional Range which established that the suppliers were non-existent.",
+       "The conditions under Section 16(2)(c) of the CGST Act, 2017 regarding actual payment of tax by the supplier have not been considered."
+     ]},
+    "The amount in dispute is ₹8,25,000/- (Rupees Eight Lakh Twenty Five Thousand only). The application is being filed within the time limit of six months from the date of communication of the order.",
+    "It is requested that the application may kindly be taken on record and listed for hearing."
+  ],
+  "closing": "Yours faithfully,",
+  "signatory": {"name": "", "designation": "Assistant Commissioner (Legal)", "office_line": ""},
+  "enclosures": ["Application in FORM GST APL-03 with grounds of appeal (in duplicate)", "Certified copy of OIO No. 18/2026-GST (ADC) dated 30.07.2026", "Copy of Review Order No. 07/2026-GST (Review) dated 10.10.2026"],
+  "copy_to": ["M/s Sri Murugan Traders, GSTIN 33AABFS1234K1ZH - for information.", "The Additional Commissioner (Adjudication) - for information."],
+  "key_facts": {"taxpayer_name": "Sri Murugan Traders", "trade_name": "Sri Murugan Traders", "gstin": "33AABFS1234K1ZH",
+                "period": "2022-23", "document_no": "18/2026-GST (ADC)", "document_date": "30.07.2026",
+                "date_of_communication": "04.08.2026", "issuing_authority": "Additional Commissioner",
+                "amount_involved": "825000", "amount_in_dispute": "825000", "issue_in_brief": "Ineligible ITC from non-existent suppliers",
+                "deadline": "04.02.2027", "forum": "Commissioner (Appeals)", "case_no": ""},
+  "legal_citations": [
+    {"provision": "Section 107(2) of the CGST Act, 2017", "purpose": "Review and application to Appellate Authority", "basis": "source"},
+    {"provision": "Rule 109 of the CGST Rules, 2017", "purpose": "Form APL-03", "basis": "suggested"}
+  ],
+  "deadlines": [{"event": "Last date for application under Section 107(2)", "date": "04.02.2027", "basis": "6 months from communication on 04.08.2026"}],
+  "missing_or_uncertain": ["Address of the Appellate Authority not in source"],
+  "source_documents": [{"title": "Order-in-Original", "no_and_date": "18/2026-GST (ADC) dated 30.07.2026"}]
+}

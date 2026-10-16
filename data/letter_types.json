@@ -1,0 +1,118 @@
+{
+  "schema_version": "1.0",
+  "letter_types": {
+    "taxpayer": {
+      "label": "Letter to Taxpayer",
+      "description": "Intimations, requests for documents/clarification, reminders, replies to taxpayer representations, refund/registration/recovery correspondence.",
+      "din_required": true,
+      "default_salutation": "Sir/Madam,",
+      "example_instructions": [
+        "Request the taxpayer to furnish documents listed in the source within 15 days",
+        "Reply to the taxpayer's representation dated __ rejecting the request with reasons",
+        "Reminder for payment of confirmed demand as per OIO"
+      ],
+      "checklist": [
+        "Legal name AND trade name of the taxpayer exactly as in the source",
+        "GSTIN (15 characters, copy character-by-character), PAN if given",
+        "Complete principal place of business address, email ID, mobile",
+        "Taxpayer's letter / representation / ARN number and date being referred to",
+        "Tax period(s) / financial year(s) involved",
+        "Issue in one line, and the specific documents or action required",
+        "Amounts involved: tax, interest, penalty, split by CGST / SGST / IGST / Cess",
+        "Statutory provisions under which the communication is issued (as cited in source)",
+        "Time limit given to the taxpayer for reply / compliance",
+        "Jurisdictional Range / Division of the taxpayer"
+      ]
+    },
+    "appeal_review": {
+      "label": "Appeal / Review (OIO / OIA)",
+      "description": "Review of Orders-in-Original / Orders-in-Appeal, proposals to file appeal before Commissioner (Appeals) / GSTAT / High Court, forwarding of review orders and appeal papers, acceptance of orders.",
+      "din_required": false,
+      "default_salutation": "Sir/Madam,",
+      "example_instructions": [
+        "Forward the review proposal for filing appeal under Section 107(2) against the OIO",
+        "Intimate acceptance of the Order-in-Appeal with reasons",
+        "Forward APL-03 application papers to the Commissioner (Appeals)"
+      ],
+      "checklist": [
+        "Order No. (OIO / OIA), date of order, DIN of the order",
+        "Name and designation of the adjudicating / appellate authority who passed the order",
+        "DATE OF RECEIPT / COMMUNICATION of the order in this office (separately from the order date)",
+        "Taxpayer legal name, trade name, GSTIN, address",
+        "SCN number and date from which the order arises; period involved",
+        "Demand proposed in SCN vs demand confirmed / dropped in the order: tax, interest, penalty for CGST / SGST / IGST / Cess",
+        "Key findings of the authority (paragraph numbers of the order)",
+        "Grounds on which the order appears not legal or proper (only those supported by the source)",
+        "Provision for review / appeal: Section 107(2) (against OIO, to Appellate Authority) or Section 112(3) (against OIA, to Appellate Tribunal) of the CGST Act, 2017, and corresponding State Act provision if cited",
+        "Limitation: last date for review / filing, with the date it is counted from",
+        "Amount in dispute for checking monetary limits for departmental appeals (if forum is GSTAT / High Court / Supreme Court)",
+        "Review order / Committee details, if any"
+      ]
+    },
+    "court_writ": {
+      "label": "Court / Writ Matter",
+      "description": "Writ petitions, counter affidavits, para-wise comments, instructions to Standing Counsel, compliance with court orders (Madras High Court, Madurai Bench etc.).",
+      "din_required": false,
+      "default_salutation": "Sir/Madam,",
+      "example_instructions": [
+        "Forward para-wise comments on the writ petition to the Standing Counsel",
+        "Request the Standing Counsel to file counter affidavit before the next hearing date",
+        "Report compliance with the High Court order to the Commissioner"
+      ],
+      "checklist": [
+        "Court and Bench (e.g. High Court of Judicature at Madras, Madurai Bench)",
+        "Case number with year (W.P.(MD) No. ___ of 20__, W.M.P. (MD) No.) and date of filing",
+        "Petitioner name (and GSTIN if a taxpayer); list of respondents with respondent numbers; which respondent is this office",
+        "Impugned order / notice: number, date, authority",
+        "Prayer sought by the petitioner",
+        "Interim orders / directions of the Court with date, and next hearing date",
+        "Name of the Standing Counsel / Senior Panel Counsel, if mentioned",
+        "Department's stand: factual and legal points, with provisions of law relied upon",
+        "Deadline for filing counter / compliance"
+      ]
+    },
+    "scn_adjudication": {
+      "label": "SCN / Adjudication",
+      "description": "Correspondence relating to Show Cause Notices under Sections 73/74/74A/76 etc., personal hearing intimations, reminders for reply, DRC-01A/DRC-01 related letters, adjournments.",
+      "din_required": true,
+      "default_salutation": "Sir/Madam,",
+      "example_instructions": [
+        "Intimate personal hearing on __ at __ hrs for the SCN",
+        "Second reminder to file reply to the SCN",
+        "Reject request for further adjournment citing Section 75(5)"
+      ],
+      "checklist": [
+        "SCN number, date, DIN, and the issuing authority",
+        "Section under which SCN is issued (73 / 74 for FY 2017-18 to 2023-24; 74A for FY 2024-25 onwards; 76; 122; 129/130 etc.)",
+        "Taxpayer legal name, trade name, GSTIN, address, email",
+        "Period / financial year(s) covered",
+        "Demand proposed: tax, interest, penalty for CGST / SGST / IGST / Cess",
+        "Issue(s) in brief",
+        "Date by which reply was due; whether reply received (date)",
+        "Personal hearing dates already fixed and number of adjournments already granted (Section 75(5): not more than three times)",
+        "Proposed PH date, time, venue / virtual link",
+        "Time limit for passing order (Section 73(10) / 74(10) / 74A(7), with any extension notified)"
+      ]
+    },
+    "admin": {
+      "label": "Administrative / Inter-office",
+      "description": "Letters to Commissionerate / Zone / Board / Division / Range, reports, statements, RTI replies, general correspondence.",
+      "din_required": false,
+      "default_salutation": "Sir/Madam,",
+      "example_instructions": [
+        "Submit the monthly report on legal cases called for in the reference",
+        "Request the Division to furnish the status of the cases listed in the reference",
+        "Reply to the RTI application within the statutory time"
+      ],
+      "checklist": [
+        "Reference letter number, date and issuing office being replied to",
+        "What exactly is called for / requested, and in what format",
+        "Due date given in the reference",
+        "Facts, figures and status to be reported (copy numbers exactly)",
+        "Whom the letter is addressed to, through whom, and copies to whom",
+        "Enclosures to be sent",
+        "For RTI: application number, date of receipt, information sought, sections of the RTI Act, 2005 applicable, appellate authority details"
+      ]
+    }
+  }
+}

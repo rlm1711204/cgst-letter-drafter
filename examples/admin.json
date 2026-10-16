@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "letter_type": "admin",
+  "file_no": "GEXCOM/LGL/MISC/19/2026",
+  "date": "16.10.2026",
+  "to": [{"designation": "The Additional Commissioner (Legal)", "organisation": "Office of the Principal Chief Commissioner of GST & Central Excise, Chennai Zone", "address_lines": ["Chennai."]}],
+  "through": "The Commissioner of CGST & Central Excise, Tirunelveli Commissionerate",
+  "subject": "Monthly report on pending legal cases for the month of September 2026 - reg.",
+  "references": ["Zonal letter dated 01.09.2026"],
+  "body_paragraphs": [
+    "Please refer to the letter cited above. The monthly report on pending legal cases for the month of September 2026 is furnished below:",
+    {"table": {"caption": "", "headers": ["Forum", "Opening balance", "Received", "Disposed", "Closing balance"],
+               "rows": [["Commissioner (Appeals)", "42", "6", "4", "44"], ["High Court", "18", "2", "1", "19"], ["Total", "60", "8", "5", "63"]]}},
+    "This is submitted for kind information."
+  ],
+  "signatory": {"designation": "Assistant Commissioner (Legal)"},
+  "copy_to": []
+}

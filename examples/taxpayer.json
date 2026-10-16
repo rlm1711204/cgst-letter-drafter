@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "letter_type": "taxpayer",
+  "file_no": "GEXCOM/LGL/TP/212/2026",
+  "din": "CBIC-DIN-20261056XY000012AB34",
+  "date": "16.10.2026",
+  "to": [{"name": "M/s Kaveri Textiles", "designation": "", "organisation": "",
+          "address_lines": ["No. 14, South Car Street,", "Tirunelveli - 627 006."],
+          "gstin": "33AAGFK9876D1Z3", "email": "kaveritextiles@example.com"}],
+  "through": "", "kind_attention": "",
+  "subject": "Request for documents in connection with the appeal filed against Order-in-Original No. 09/2026-GST dated 12.05.2026 - reg.",
+  "references": ["Your letter dated 02.10.2026"],
+  "salutation": "Sir/Madam,",
+  "body_paragraphs": [
+    "Please refer to your letter cited above regarding the appeal filed by you against the Order-in-Original No. 09/2026-GST dated 12.05.2026.",
+    {"text": "In order to furnish the department's comments to the Appellate Authority, you are requested to furnish the following documents:",
+     "points": ["Copy of the appeal in FORM GST APL-01 along with acknowledgement in FORM GST APL-02", "Proof of payment of pre-deposit under Section 107(6) of the CGST Act, 2017"]},
+    "The above documents may be furnished within 15 days from the date of receipt of this letter."
+  ],
+  "closing": "Yours faithfully,",
+  "signatory": {"name": "", "designation": "Superintendent (Legal)", "office_line": ""},
+  "enclosures": [], "copy_to": [],
+  "key_facts": {"taxpayer_name": "Kaveri Textiles", "gstin": "33AAGFK9876D1Z3", "period": "2021-22", "document_no": "09/2026-GST", "document_date": "12.05.2026"},
+  "legal_citations": [{"provision": "Section 107(6) of the CGST Act, 2017", "purpose": "pre-deposit", "basis": "source"}],
+  "deadlines": [], "missing_or_uncertain": [], "source_documents": []
+}

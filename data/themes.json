@@ -1,0 +1,100 @@
+{
+  "_comment": "Add your own theme by copying a block. Any key left out falls back to 'CBIC Classic'. Margins are in cm. para_numbering: all | from_second | none. signature_align: right | left. date_style: any strftime pattern.",
+  "themes": {
+    "CBIC Classic": {
+      "font": "Times New Roman",
+      "hindi_font": "Nirmala UI",
+      "size": 12,
+      "line_spacing": 1.15,
+      "space_after": 6,
+      "page_size": "A4",
+      "margin_top": 2.0,
+      "margin_bottom": 2.0,
+      "margin_left": 2.54,
+      "margin_right": 2.0,
+      "justify": true,
+      "first_line_indent": 1.27,
+      "para_numbering": "all",
+      "subject_bold": true,
+      "subject_underline": false,
+      "subject_hanging": true,
+      "name_in_brackets": true,
+      "name_uppercase": false,
+      "signature_align": "right",
+      "letterhead_on": "first page",
+      "page_numbers": true,
+      "bilingual_labels": false,
+      "date_style": "%d.%m.%Y",
+      "file_and_date_same_line": true,
+      "salutation_position": "after_subject",
+      "signature_gap_lines": 3,
+      "stars_after_ref": false,
+      "labels": {
+        "file_no": "F.No.",
+        "din": "DIN:",
+        "date": "Date:",
+        "to": "To,",
+        "through": "Through:",
+        "kind_attention": "Kind Attention:",
+        "subject": "Sub:",
+        "reference": "Ref:",
+        "encl": "Encl.:",
+        "copy_to": "Copy to:"
+      }
+    },
+    "Modern Arial": {
+      "font": "Arial",
+      "size": 11,
+      "line_spacing": 1.15,
+      "space_after": 8,
+      "first_line_indent": 0,
+      "subject_underline": false
+    },
+    "Bookman Formal": {
+      "font": "Bookman Old Style",
+      "size": 12,
+      "line_spacing": 1.5,
+      "space_after": 6,
+      "subject_underline": true,
+      "name_uppercase": true
+    },
+    "Compact One-Page": {
+      "font": "Times New Roman",
+      "size": 11,
+      "line_spacing": 1.0,
+      "space_after": 4,
+      "margin_top": 1.5,
+      "margin_bottom": 1.5,
+      "margin_left": 2.0,
+      "margin_right": 1.5,
+      "first_line_indent": 0
+    },
+    "Bilingual (Hindi-English)": {
+      "font": "Times New Roman",
+      "size": 12,
+      "bilingual_labels": true
+    },
+    "Cambria Clean": {
+      "font": "Cambria",
+      "size": 11.5,
+      "line_spacing": 1.2,
+      "space_after": 6,
+      "para_numbering": "from_second",
+      "first_line_indent": 0
+    }
+  },
+  "bilingual_labels": {
+    "file_no": "फा. सं. / F.No.",
+    "din": "डिन / DIN:",
+    "date": "दिनांक / Date:",
+    "to": "सेवा में / To,",
+    "through": "द्वारा / Through:",
+    "kind_attention": "ध्यानार्थ / Kind Attention:",
+    "subject": "विषय / Sub:",
+    "reference": "संदर्भ / Ref:",
+    "encl": "संलग्नक / Encl.:",
+    "copy_to": "प्रतिलिपि / Copy to:",
+    "closing": "भवदीय / Yours faithfully,",
+    "salutation": "महोदय / महोदया, Sir/Madam,"
+  }
+}

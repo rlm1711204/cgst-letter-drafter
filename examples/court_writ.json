@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "letter_type": "court_writ",
+  "file_no": "GEXCOM/LGL/WP/88/2026-LEGAL",
+  "din": "",
+  "date": "16.10.2026",
+  "to": [{"name": "Thiru [TO BE CONFIRMED: name]", "designation": "Senior Standing Counsel for CGST",
+          "organisation": "High Court of Judicature at Madras, Madurai Bench", "address_lines": ["Madurai."], "gstin": "", "email": ""}],
+  "through": "", "kind_attention": "",
+  "subject": "W.P.(MD) No. 21456 of 2026 filed by M/s Thamirabarani Agencies - Forwarding of para-wise comments for filing counter affidavit - reg.",
+  "references": ["Your letter dated 30.09.2026", "Order of the Hon'ble High Court dated 25.09.2026 in W.M.P.(MD) No. 16542 of 2026"],
+  "salutation": "Sir,",
+  "body_paragraphs": [
+    "Please refer to the above. The petitioner has filed the above Writ Petition under Article 226 of the Constitution of India challenging the order dated 14.07.2026 passed under Section 73 of the CGST Act, 2017 for the period 2020-21, on the ground that no personal hearing was granted.",
+    "In this regard, it is submitted that personal hearing was fixed on 10.06.2026, 20.06.2026 and 01.07.2026 and intimated to the petitioner through the GST portal. The petitioner neither appeared nor sought adjournment. Thus the opportunity contemplated under Section 75(4) of the CGST Act, 2017 was duly granted.",
+    "The para-wise comments are enclosed. It is requested that the counter affidavit may be filed before the next date of hearing on 28.10.2026."
+  ],
+  "closing": "Yours faithfully,",
+  "signatory": {"name": "", "designation": "Assistant Commissioner (Legal)", "office_line": ""},
+  "enclosures": ["Para-wise comments (5 pages)"],
+  "copy_to": ["The Deputy Commissioner, Tirunelveli Division - for information."],
+  "key_facts": {"case_no": "W.P.(MD) No. 21456 of 2026", "forum": "High Court of Judicature at Madras, Madurai Bench", "period": "2020-21", "deadline": "28.10.2026"},
+  "legal_citations": [], "deadlines": [{"event": "Next hearing", "date": "28.10.2026", "basis": "court order"}],
+  "missing_or_uncertain": ["Name of the Senior Standing Counsel"], "source_documents": []
+}
