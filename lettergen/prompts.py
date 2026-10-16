@@ -14,7 +14,15 @@ FILES = {
     "verify": "03_other_ai_legal_verification.md",
     "fix_json": "04_fix_invalid_json.md",
     "revise": "05_notebooklm_revise.md",
+    "short": "06_short_task.md",
+    "short_fact_check": "07_short_fact_check.md",
 }
+
+RULES_HEADER = ("{title}\n"
+                "This source is an INSTRUCTION SHEET for drafting. It is NOT evidence: never cite it or take facts "
+                "from it. Whenever a chat message refers to this sheet, follow it exactly. Values shown as "
+                "\"(given in the chat message)\" come from that message.\n\n")
+GIVEN = "(given in the chat message)"
 
 
 def load(name: str) -> str:
@@ -103,3 +111,43 @@ def verification_prompt(letter: dict, letter_text: str, issues: list[dict], cita
     return fill(load("verify"), LETTER_TYPE_LABEL=labels.get(letter.get("letter_type"), letter.get("letter_type")),
                 INSTRUCTION=instruction or letter.get("subject", ""), TODAY=dt.date.today().strftime("%d.%m.%Y"),
                 AUTO_CHECKS=auto, CITATIONS=cites, KEY_FACTS=facts, LETTER_TEXT=letter_text)
+
+
+# =========================================================================== short prompt + rules sheet
+def rules_title(kind: str) -> str:
+    return f"RULES SOURCE - CGST DRAFTER - {kind.upper().replace('_', ' ')}"
+
+
+def letter_rules_sheet() -> str:
+    """Full letter prompt with the dynamic parts generic, and the checklists of ALL letter types."""
+    types = load_data("letter_types")["letter_types"]
+    checklist = "\n".join(f"* If letter type is {k} ({v['label']}):\n" + "\n".join(f"  - {c}" for c in v["checklist"])
+                          for k, v in types.items())
+    body = fill(load("draft"), LETTER_TYPE_LABEL=GIVEN, LETTER_TYPE_KEY=" | ".join(types),
+                INSTRUCTION=GIVEN, FROM_OFFICE=GIVEN, SIGNATORY=GIVEN, FILE_NO="", DIN="",
+                FILE_NO_SHOW=GIVEN, DIN_SHOW=GIVEN, LETTER_DATE=GIVEN, CHECKLIST=checklist)
+    return RULES_HEADER.format(title=rules_title("letter")) + body
+
+
+def format_rules_sheet(fmt: str, prompt_file: str) -> str:
+    body = fill(load(prompt_file), INSTRUCTION=GIVEN, FROM_OFFICE=GIVEN, SIGNATORY=GIVEN, LETTER_DATE=GIVEN,
+                FILE_NO="", DIN="", FILE_NO_SHOW=GIVEN, DIN_SHOW=GIVEN, TODAY=GIVEN)
+    return RULES_HEADER.format(title=rules_title(fmt)) + body
+
+
+def short_prompt(kind: str, format_label: str, instruction: str, profile: dict, letter_date: str = "",
+                 file_no: str = "", din: str = "", letter_type: str = "") -> str:
+    sig = ", ".join(x for x in (profile.get("signatory_name"), profile.get("signatory_designation")) if x)
+    type_line = ""
+    if letter_type:
+        key = key_for_label(letter_type)
+        type_line = f" - letter type: {key} ({letter_type_keys().get(key, key)})"
+    return fill(load("short"), RULES_TITLE=rules_title(kind), FORMAT_LABEL=format_label, TYPE_LINE=type_line,
+                INSTRUCTION=instruction.strip() or "[describe the purpose]",
+                FROM_OFFICE=office_line(profile) or "[my office]", SIGNATORY=sig or "leave blank",
+                FILE_NO_SHOW=file_no or "not given", DIN_SHOW=din or "not given",
+                LETTER_DATE=letter_date or dt.date.today().strftime("%d.%m.%Y"))
+
+
+def draft_source_text(letter_text: str) -> str:
+    return "DRAFT FOR FACT CHECK - not evidence; delete this source after checking.\n\n" + letter_text

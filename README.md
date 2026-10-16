@@ -22,6 +22,13 @@ A Google Colab tool for the **Legal Section of a CGST & Central Excise Commissio
 
 No API key is needed. The AI work happens in NotebookLM and the AI tool you verify with; Colab only checks and formats.
 
+## NotebookLM chat box too small? Use the two-part prompt (default)
+NotebookLM's chat box accepts only short prompts, so Step 1 produces:
+1. a **rules sheet** (all the rules + the JSON layout), added **once per notebook** as a source: *Add source ▸ Copied text ▸ paste*. It is also saved in Drive under `CGST_Letter_Drafter/rules/`.
+2. a **short prompt** (under 1,000 characters) that you send each time.
+
+For Gemini / ChatGPT / Claude choose `PROMPT_STYLE = Full prompt`. With a Gemini **Gem**, paste the rules sheet into the Gem's instructions once and send only the short prompt. Fact-checking in NotebookLM works the same way: the draft is added as a temporary source, a short prompt does the check, and you delete the draft source afterwards.
+
 ## Quick start
 1. Click **Open in Colab** → *File ▸ Save a copy in Drive*.
 2. Run **Step 0 (Setup)**. It asks for Google Drive access, where your profile, templates, letters and register are kept.

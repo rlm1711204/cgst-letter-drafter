@@ -115,3 +115,19 @@ def test_time_limits_and_fy_ranges():
     r73 = rows[("2022-23", "73")]
     assert r73["scn_last_date"] == dt.date(2026, 9, 30) and r73["scn_expired"]
     assert not rows[("2022-23", "74")]["scn_expired"]
+
+
+def test_short_prompts_fit_notebooklm_and_rules_complete():
+    from lettergen import config, prompts
+    prof = dict(config.DEFAULT_PROFILE, signatory_name="A Very Long Officer Name", signatory_designation="Superintendent")
+    task = "Prepare the document from the attached Prime portal screenshots, complaint and earlier notesheet " * 2
+    for fmt, label in formats.labels().items():
+        p = prompts.short_prompt(fmt, label, task, prof, "16.10.2026", "GEXCOM/LGL/1/2026", "CBIC-DIN-123",
+                                 "Appeal / Review (OIO / OIA)" if fmt == "letter" else "")
+        assert len(p) < 1200, (fmt, len(p))
+        assert prompts.rules_title(fmt) in p
+        rules = prompts.letter_rules_sheet() if fmt == "letter" else \
+            prompts.format_rules_sheet(fmt, formats.registry()[fmt]["prompt"])
+        assert rules.startswith(prompts.rules_title(fmt))
+        assert "```json" in rules and "{{" not in rules
+    assert len(prompts.load("short_fact_check")) < 800

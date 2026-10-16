@@ -73,19 +73,24 @@ md("""
    * **SOP checklist**: the 20-row *Filing of Intelligence & Investigation* table, in your exact format.
    * **Letter + Notesheet**: letter to the taxpayer plus a notesheet for approval, in your exact format with your letterhead.
 2. Sources: upload PDFs to **[NotebookLM](https://notebooklm.google.com)**, **or** attach screenshots (GST Prime / BO taxpayer profile, return filing, ledgers) and documents to **Gemini / ChatGPT / Claude**.
-3. Run the cell, press **📋 Copy**, paste into the AI, and copy its whole answer into Step 5.
+3. **PROMPT_STYLE**:
+   * **Short prompt + rules sheet (NotebookLM)**: NotebookLM's chat box takes only short text. So add the long **rules sheet** to the notebook **once** as a source (*Add source ▸ Copied text*), then send just the **short prompt** (under 1,000 characters) each time.
+   * **Full prompt**: one long prompt for Gemini / ChatGPT / Claude, which accept long text.
+4. Run the cell, press **📋 Copy**, paste into the AI, and copy its whole answer into Step 5.
 """)
 
 code("""
 #@title 📝 STEP 1 · Build the prompt for NotebookLM { display-mode: "form" }
 DOCUMENT_FORMAT = "Letter (generic - choose a letter type)"  #@param ["Letter (generic - choose a letter type)", "SOP checklist - Filing of Intelligence & Investigation", "Letter to taxpayer + Notesheet (for approval)"]
+PROMPT_STYLE = "Short prompt + rules sheet (NotebookLM)"  #@param ["Short prompt + rules sheet (NotebookLM)", "Full prompt (Gemini / ChatGPT / Claude)"]
 LETTER_TYPE = "Appeal / Review (OIO / OIA)"  #@param ["Letter to Taxpayer", "Appeal / Review (OIO / OIA)", "Court / Writ Matter", "SCN / Adjudication", "Administrative / Inter-office"]
 WHAT_SHOULD_THE_LETTER_DO = "Forward the application under Section 107(2) against the OIO to the Commissioner (Appeals)"  #@param {type:"string"}
 LETTER_DATE = ""  #@param {type:"string"}
 FILE_NO = ""  #@param {type:"string"}
 DIN = ""  #@param {type:"string"}
 #@markdown *LETTER_TYPE is used only for the generic Letter. Leave LETTER_DATE blank for today, and FILE_NO / DIN blank if you'll add them later; the checker reminds you.*
-ui.step1_prompt(LETTER_TYPE, WHAT_SHOULD_THE_LETTER_DO, LETTER_DATE, FILE_NO, DIN, doc_format=DOCUMENT_FORMAT);
+ui.step1_prompt(LETTER_TYPE, WHAT_SHOULD_THE_LETTER_DO, LETTER_DATE, FILE_NO, DIN, doc_format=DOCUMENT_FORMAT,
+               prompt_style=PROMPT_STYLE);
 """)
 
 md("""

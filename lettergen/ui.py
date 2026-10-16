@@ -55,6 +55,7 @@ class Session:
     edit_box = None
     edit_original = ""
     instruction = ""
+    prompt_style = "Short prompt + rules sheet (NotebookLM)"
     fmt = "letter"
 
 
@@ -132,12 +133,25 @@ def setup(use_drive: bool = True, quiet: bool = False):
 
 
 # =========================================================================== step 1: NotebookLM prompt
+SHORT = "Short prompt + rules sheet (NotebookLM)"
+FULL = "Full prompt (Gemini / ChatGPT / Claude)"
+
+
+def _rules_sheet(fmt: str) -> str:
+    if fmt == "letter":
+        return prompts.letter_rules_sheet()
+    return prompts.format_rules_sheet(fmt, formats.registry()[fmt]["prompt"])
+
+
 def step1_prompt(letter_type: str, instruction: str, letter_date: str = "", file_no: str = "", din: str = "",
-                 doc_format: str = "letter"):
+                 doc_format: str = "letter", prompt_style: str = SHORT):
     ws = _need_ws()
     S.instruction = instruction
     fmt = formats.key_for(doc_format)
+    S.prompt_style = prompt_style
     ws.save_settings(last_letter_type=letter_type, last_instruction=instruction, last_format=fmt)
+    if prompt_style != FULL:
+        return _step1_short(fmt, letter_type, instruction, letter_date, file_no, din)
     if fmt != "letter":
         cfg = formats.registry()[fmt]
         p = formats.prompt(fmt, instruction, ws.profile(), letter_date, file_no, din)
@@ -160,6 +174,34 @@ def step1_prompt(letter_type: str, instruction: str, letter_date: str = "", file
         _say("Example instructions for this type: " + " · ".join(f"<i>{html.escape(x)}</i>"
                                                                   for x in t["example_instructions"]))
     return p
+
+
+def _step1_short(fmt, letter_type, instruction, letter_date, file_no, din):
+    ws = _need_ws()
+    label = formats.registry()[fmt]["label"]
+    rules = _rules_sheet(fmt)
+    rdir = ws.root / "rules"
+    rdir.mkdir(exist_ok=True)
+    rname = f"RULES_{fmt}.txt"
+    (rdir / rname).write_text(rules, encoding="utf-8")
+    short = prompts.short_prompt(fmt, label, instruction, ws.profile(), letter_date, file_no, din,
+                                 letter_type if fmt == "letter" else "")
+    _html(f"""<div style='font-family:Arial,sans-serif;font-size:13px;line-height:1.5'>
+<b>Two-part prompt (fits NotebookLM's chat box)</b><br>
+<b>A. Once per notebook</b> - add the <b>rules sheet</b> below as a source: NotebookLM ▸ <i>Add source</i> ▸
+<i>Copied text</i> ▸ paste (or upload the downloaded .txt). Tick it as a source like your PDFs.
+It is also saved in Drive: <code>{html.escape(str(rdir / rname))}</code><br>
+<b>B. Each time</b> - paste the <b>short prompt</b> ({0} characters) in the chat. Upload the case documents /
+screenshots as the other sources.<br>
+<span style='color:#666'>Using a Gemini <b>Gem</b>? Paste the rules sheet into the Gem's instructions once, then
+send only the short prompt with your screenshots.</span></div>""".replace("{0}", str(len(short))))
+    copy_box(short, f"B. SHORT PROMPT → chat ({len(short)} characters)", f"short_prompt_{fmt}.txt", 150)
+    copy_box(rules, f"A. RULES SHEET → NotebookLM ▸ Add source ▸ Copied text (once per notebook) - "
+                    f"{label}", rname, 120)
+    if formats.registry()[fmt].get("din_required"):
+        _say("Reminder: generate the DIN on the CBIC DDM portal; a letter to a taxpayer without a DIN is invalid.",
+             "warn")
+    return short
 
 
 # =========================================================================== step 2: office profile
@@ -556,7 +598,15 @@ def step7_verify_prompts():
     p2 = prompts.fact_check_prompt(text)
     vl = S.letter if S.fmt == "letter" else dict(S.letter, letter_type=formats.registry()[S.fmt]["label"])
     p3 = prompts.verification_prompt(vl, text, S.issues, S.citations, S.instruction)
-    copy_box(p2, "PROMPT 02 → same NotebookLM notebook (facts vs. source)", "02_fact_check.txt", 200)
+    if S.prompt_style != FULL:
+        _say("NotebookLM fact check in 3 moves: (1) add the DRAFT below as a source (Add source ▸ Copied text), "
+             "(2) send the short fact-check prompt, (3) delete the draft source afterwards.")
+        copy_box(prompts.draft_source_text(text), "DRAFT → NotebookLM ▸ Add source ▸ Copied text",
+                 "DRAFT_for_fact_check.txt", 140)
+        copy_box(prompts.load("short_fact_check"), "SHORT FACT-CHECK PROMPT → NotebookLM chat", None, 110)
+    else:
+        copy_box(p2, "PROMPT 02 → Gemini / ChatGPT with the sources attached (facts vs. source)",
+                 "02_fact_check.txt", 200)
     copy_box(p3, "PROMPT 03 → ChatGPT / Claude / Gemini (legal provisions, limitation, format)",
              "03_legal_verification.txt", 240)
     copy_box(prompts.load("revise"), "PROMPT 05 → NotebookLM (apply the corrections, then repeat Step 5)", None, 120)
